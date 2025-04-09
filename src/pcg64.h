@@ -53,12 +53,7 @@ extern "C" {
         uint64_t low;
     } pcg128_t;
 
-    inline pcg128_t PCG_128BIT_CONSTANT(uint64_t high, uint64_t low) {
-        pcg128_t result;
-        result.high = high;
-        result.low = low;
-        return result;
-    }
+    #define PCG_128BIT_CONSTANT(high,low) ((pcg128_t){.high = high, .low = low})
 
     #define PCG_EMULATED_128BIT_MATH 1
 #endif
