@@ -1,0 +1,18 @@
+{
+    "name": "random",
+    "version": "0.0.0",
+    "repo": "goodcleanfun/random",
+    "description": "Random number generation using the PCG family (same as numpy), including 32 and 64 bit implementations",
+    "keywords": [],
+    "license": "MIT",
+    "dependencies": {
+        "silentbicycle/greatest": "*"
+    },
+    "src": [
+        "src/pcg32.h",
+        "src/pcg64.h",
+        "src/rand32.h",
+        "src/rand64.h"
+    ]
+    
+  }
