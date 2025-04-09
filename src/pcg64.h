@@ -27,6 +27,14 @@
 
 #include <inttypes.h>
 
+#ifdef _WIN32
+#include <stdlib.h>
+#endif
+
+#if defined(_WIN32) && !defined (__MINGW32__)
+#define inline __forceinline
+#endif
+
 #if __GNUC_GNU_INLINE__  &&  !defined(__cplusplus)
     #error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
 #endif
@@ -186,48 +194,57 @@ pcg_setseq_128_xsl_rr_64_boundedrand_r(pcg_state_setseq_128* rng,
     }
 }
 
+/* Multi-step advance functions (jump-ahead, jump-back)
+ *
+ * The method used here is based on Brown, "Random Number Generation
+ * with Arbitrary Stride,", Transactions of the American Nuclear
+ * Society (Nov. 1994).  The algorithm is very similar to fast
+ * exponentiation.
+ *
+ * Even though delta is an unsigned integer, we can pass a
+ * signed integer to go backwards, it just goes "the long way round".
+ */
 
 #ifndef PCG_EMULATED_128BIT_MATH
 
 pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
-			    pcg128_t cur_plus)
-{
-   pcg128_t acc_mult = 1u;
-   pcg128_t acc_plus = 0u;
-   while (delta > 0) {
-       if (delta & 1) {
-	   acc_mult *= cur_mult;
-	   acc_plus = acc_plus * cur_mult + cur_plus;
-       }
-       cur_plus = (cur_mult + 1) * cur_plus;
-       cur_mult *= cur_mult;
-       delta /= 2;
-   }
-   return acc_mult * state + acc_plus;
+                             pcg128_t cur_plus) {
+    pcg128_t acc_mult = 1u;
+    pcg128_t acc_plus = 0u;
+    while (delta > 0) {
+        if (delta & 1) {
+            acc_mult *= cur_mult;
+            acc_plus = acc_plus * cur_mult + cur_plus;
+        }
+        cur_plus = (cur_mult + 1) * cur_plus;
+        cur_mult *= cur_mult;
+        delta /= 2;
+    }
+    return acc_mult * state + acc_plus;
 }
 
 #else
 
 pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
-			    pcg128_t cur_plus)
-{
-   pcg128_t acc_mult = PCG_128BIT_CONSTANT(0u, 1u);
-   pcg128_t acc_plus = PCG_128BIT_CONSTANT(0u, 0u);
-   while ((delta.high > 0) || (delta.low > 0)) {
-       if (delta.low & 1) {
-	   acc_mult = _pcg128_mult(acc_mult, cur_mult);
-	   acc_plus = _pcg128_add(_pcg128_mult(acc_plus, cur_mult), cur_plus);
-       }
-       cur_plus = _pcg128_mult(_pcg128_add(cur_mult, PCG_128BIT_CONSTANT(0u, 1u)), cur_plus);
-       cur_mult = _pcg128_mult(cur_mult, cur_mult);
-       delta.low >>= 1;
-       delta.low += delta.high & 1;
-       delta.high >>= 1;
-   }
-   return _pcg128_add(_pcg128_mult(acc_mult, state), acc_plus);
+                             pcg128_t cur_plus) {
+    pcg128_t acc_mult = PCG_128BIT_CONSTANT(0u, 1u);
+    pcg128_t acc_plus = PCG_128BIT_CONSTANT(0u, 0u);
+    while ((delta.high > 0) || (delta.low > 0)) {
+        if (delta.low & 1) {
+            acc_mult = _pcg128_mult(acc_mult, cur_mult);
+            acc_plus = _pcg128_add(_pcg128_mult(acc_plus, cur_mult), cur_plus);
+        }
+        cur_plus = _pcg128_mult(_pcg128_add(cur_mult, PCG_128BIT_CONSTANT(0u, 1u)),
+                                cur_plus);
+        cur_mult = _pcg128_mult(cur_mult, cur_mult);
+        delta.low = (delta.low >> 1) | (delta.high << 63);
+        delta.high >>= 1;
+    }
+    return pcg128_add(pcg128_mult(acc_mult, state), acc_plus);
 }
 
 #endif
+
 
 inline void pcg_setseq_128_advance_r(pcg_state_setseq_128* rng, pcg128_t delta)
 {
@@ -254,7 +271,6 @@ typedef pcg_state_setseq_128    pcg64_random_t;
 #define pcg64_srandom_r         pcg_setseq_128_srandom_r
 #define pcg64_advance_r         pcg_setseq_128_advance_r
 #define PCG64_INITIALIZER       PCG_STATE_SETSEQ_128_INITIALIZER
-
 
 #if __cplusplus
 }
