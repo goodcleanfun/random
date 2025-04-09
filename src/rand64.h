@@ -3,7 +3,7 @@
 
 #include "pcg64.h"
 
-static pcg64_random_t pcg64_global = PCG64_INITIALIZER;
+static pcg64_random_t pcg64_global = (pcg64_random_t)PCG64_INITIALIZER;
 
 static inline void rand64_seed(pcg64_random_t *rng, uint64_t seed1, uint64_t seed2) {
     pcg64_srandom_r(rng, PCG_128BIT_CONSTANT(0, seed1), PCG_128BIT_CONSTANT(0, seed2));
