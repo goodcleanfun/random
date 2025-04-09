@@ -240,7 +240,7 @@ pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
         delta.low = (delta.low >> 1) | (delta.high << 63);
         delta.high >>= 1;
     }
-    return pcg128_add(pcg128_mult(acc_mult, state), acc_plus);
+    return _pcg128_add(_pcg128_mult(acc_mult, state), acc_plus);
 }
 
 #endif
