@@ -72,8 +72,8 @@ typedef struct {
 #define PCG_DEFAULT_INCREMENT_128  \
         PCG_128BIT_CONSTANT(6364136223846793005ULL,1442695040888963407ULL)
 #define PCG_STATE_SETSEQ_128_INITIALIZER                                       \
-    ((pcg_state_setseq_128){PCG_128BIT_CONSTANT(0x979c9a98d8462005ULL, 0x7d3e9cb6cfe0549bULL),       \
-                            PCG_128BIT_CONSTANT(0x0000000000000001ULL, 0xda3e39cb94b95bdbULL)})
+    { PCG_128BIT_CONSTANT(0x979c9a98d8462005ULL, 0x7d3e9cb6cfe0549bULL),       \
+      PCG_128BIT_CONSTANT(0x0000000000000001ULL, 0xda3e39cb94b95bdbULL) }
 
 inline uint64_t pcg_rotr_64(uint64_t value, unsigned int rot)
 {
