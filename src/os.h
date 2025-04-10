@@ -30,40 +30,13 @@
     #include <unistd.h>
 #endif
 
-#if HAVE_DEV_RANDOM 
-/* os_random_bytes(dest, size):
- *     Use /dev/urandom to get some external entropy for seeding purposes.
- *
- * Note:
- *     If reading /dev/urandom fails (which ought to never happen), it returns
- *     false, otherwise it returns true.  If it fails, you could instead call
- *     fallback_os_random_bytes which always succeeds.
- */
-
-static bool os_random_bytes(void* dest, size_t size)
-{
-    int fd = open("/dev/urandom", O_RDONLY);
-    if (fd < 0)
-        return false;
-    ssize_t sz = read(fd, dest, size);
-    return (close(fd) == 0) && (sz == (ssize_t) size);
-}
-#else
-static bool os_random_bytes(void* dest, size_t size)
-{
-    fallback_os_random_bytes(dest, size);
-    return true;
-}
-#endif
-
-
 /* fallback_os_random_bytes(dest, size):
  *     Works like the /dev/random version above, but avoids using /dev/random.
  *     Instead, it uses a private RNG (so that repeated calls will return
  *     different seeds).  Makes no attempt at cryptographic security.
  */
 
-void fallback_os_random_bytes(void* dest, size_t size)
+void fallback_os_random_bytes(void *dest, size_t size)
 {
     /* Most modern OSs use address-space randomization, meaning that we can
        use the address of stack variables and system library code as
@@ -93,6 +66,31 @@ void fallback_os_random_bytes(void* dest, size_t size)
     spinlock_unlock(&mutex);
 }
 
+#if HAVE_DEV_RANDOM 
+/* os_random_bytes(dest, size):
+ *     Use /dev/urandom to get some external entropy for seeding purposes.
+ *
+ * Note:
+ *     If reading /dev/urandom fails (which ought to never happen), it returns
+ *     false, otherwise it returns true.  If it fails, you could instead call
+ *     fallback_os_random_bytes which always succeeds.
+ */
+
+static bool os_random_bytes(void *dest, size_t size)
+{
+    int fd = open("/dev/urandom", O_RDONLY);
+    if (fd < 0)
+        return false;
+    ssize_t sz = read(fd, dest, size);
+    return (close(fd) == 0) && (sz == (ssize_t) size);
+}
+#else
+static bool os_random_bytes(void *dest, size_t size)
+{
+    fallback_os_random_bytes(dest, size);
+    return true;
+}
+#endif
 
 
 #endif // OS_RANDOM_H
