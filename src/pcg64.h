@@ -53,7 +53,7 @@ extern "C" {
         uint64_t low;
     } pcg128_t;
 
-    #define PCG_128BIT_CONSTANT(high, low) ((pcg128_t){high, low})
+    #define PCG_128BIT_CONSTANT(high, low) {high, low}
 
     #define PCG_EMULATED_128BIT_MATH 1
 #endif
@@ -145,7 +145,7 @@ inline void pcg_setseq_128_srandom_r(pcg_state_setseq_128* rng,
     pcg_setseq_128_step_r(rng);
 }
 
-#else /* PCG_EMULATED_128BIT_MATH */
+#else
 
 inline void pcg_setseq_128_step_r(pcg_state_setseq_128* rng)
 {
