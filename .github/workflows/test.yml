@@ -70,7 +70,7 @@ jobs:
           mkdir -p deps\greatest
           curl -L https://github.com/silentbicycle/greatest/raw/release/greatest.h -o deps\greatest\greatest.h
       - name: Run tests with MSVC
-        run: make CC=cl CFLAGS="/std:c11" test
+        run: make CC=cl CFLAGS="/std:c11 /volatile:iso /experimental:c11atomics" test
 
   test-windows-mingw:
     runs-on: windows-latest
