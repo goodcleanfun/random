@@ -1,15 +1,20 @@
 #ifndef RAND64_H
 #define RAND64_H
 
-#include "pcg64.h"
 #include <stdbool.h>
+
+#include "pcg64.h"
+#include "spinlock/spinlock.h"
 
 static pcg64_random_t pcg64_global;
 static bool pcg64_initialized = false;
+static spinlock_t pcg64_lock = SPINLOCK_INIT;
 
 static inline void rand64_init() {
+    spinlock_lock(&pcg64_lock);
     pcg64_global = (pcg64_random_t) PCG64_INITIALIZER;
     pcg64_initialized = true;
+    spinlock_unlock(&pcg64_lock);
 }
 
 static inline void rand64_seed(pcg64_random_t *rng, uint64_t seed1, uint64_t seed2) {
