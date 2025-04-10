@@ -12,6 +12,7 @@
         "silentbicycle/greatest": "*"
     },
     "src": [
+        "src/os.h",
         "src/pcg32.h",
         "src/pcg64.h",
         "src/rand32.h",
