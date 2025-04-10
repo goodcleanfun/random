@@ -14,7 +14,7 @@ static inline void rand64_init() {
 
 static inline void rand64_seed(pcg64_random_t *rng, uint64_t seed1, uint64_t seed2) {
     if (!pcg64_initialized) rand64_init();
-    pcg64_srandom_r(rng, PCG_128BIT_CONSTANT(0, seed1), PCG_128BIT_CONSTANT(0, seed2));
+    pcg64_srandom_r(rng, (pcg128_t) PCG_128BIT_CONSTANT(0, seed1), (pcg128_t) PCG_128BIT_CONSTANT(0, seed2));
 }
 
 static inline uint64_t rand64() {
@@ -32,7 +32,7 @@ static inline pcg64_random_t rand64_gen_init() {
 }
 
 static inline void rand64_gen_seed(pcg64_random_t *rng, uint64_t seed1, uint64_t seed2) {
-    pcg64_srandom_r(rng, PCG_128BIT_CONSTANT(0, seed1), PCG_128BIT_CONSTANT(0, seed2));
+    pcg64_srandom_r(rng, (pcg128_t) PCG_128BIT_CONSTANT(0, seed1), (pcg128_t) PCG_128BIT_CONSTANT(0, seed2));
 }
 
 static inline uint64_t rand64_gen_random(pcg64_random_t *rng) {
@@ -44,7 +44,7 @@ static inline uint64_t rand64_gen_bounded(pcg64_random_t *rng, uint64_t bound) {
 }
 
 static inline void rand64_gen_advance(pcg64_random_t *rng, uint64_t delta) {
-    pcg64_advance_r(rng, PCG_128BIT_CONSTANT(0, delta));
+    pcg64_advance_r(rng, (pcg128_t) PCG_128BIT_CONSTANT(0, delta));
 }
 
 #endif // RAND64_H

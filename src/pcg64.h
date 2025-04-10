@@ -121,7 +121,7 @@ inline pcg128_t _pcg128_mult(pcg128_t a, pcg128_t b) {
 
 inline void pcg_setseq_128_step_r(pcg_state_setseq_128* rng)
 {
-    rng->state = _pcg128_add(_pcg128_mult(rng->state, PCG_DEFAULT_MULTIPLIER_128), rng->inc);
+    rng->state = _pcg128_add(_pcg128_mult(rng->state, (pcg128_t) PCG_DEFAULT_MULTIPLIER_128), rng->inc);
 }
 
 inline uint64_t pcg_output_xsl_rr_128_64(pcg128_t state)
@@ -133,7 +133,7 @@ inline uint64_t pcg_output_xsl_rr_128_64(pcg128_t state)
 inline void pcg_setseq_128_srandom_r(pcg_state_setseq_128* rng,
                                      pcg128_t initstate, pcg128_t initseq)
 {
-    rng->state = PCG_128BIT_CONSTANT(0ULL, 0ULL);
+    rng->state = (pcg128_t) PCG_128BIT_CONSTANT(0ULL, 0ULL);
     /* Ensure that the increment is odd. */
     rng->inc.high = initseq.high << 1u;
     /* Shift the highest bit from the low word up to the lowest bit of the high
@@ -230,7 +230,7 @@ pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
             acc_mult = _pcg128_mult(acc_mult, cur_mult);
             acc_plus = _pcg128_add(_pcg128_mult(acc_plus, cur_mult), cur_plus);
         }
-        cur_plus = _pcg128_mult(_pcg128_add(cur_mult, PCG_128BIT_CONSTANT(0u, 1u)),
+        cur_plus = _pcg128_mult(_pcg128_add(cur_mult, (pcg128_t) PCG_128BIT_CONSTANT(0u, 1u)),
                                 cur_plus);
         cur_mult = _pcg128_mult(cur_mult, cur_mult);
         delta.low = (delta.low >> 1) | (delta.high << 63);
@@ -245,7 +245,7 @@ pcg128_t pcg_advance_lcg_128(pcg128_t state, pcg128_t delta, pcg128_t cur_mult,
 inline void pcg_setseq_128_advance_r(pcg_state_setseq_128* rng, pcg128_t delta)
 {
     rng->state = pcg_advance_lcg_128(rng->state, delta,
-                                     PCG_DEFAULT_MULTIPLIER_128, rng->inc);
+                                     (pcg128_t) PCG_DEFAULT_MULTIPLIER_128, rng->inc);
 }
 
 
