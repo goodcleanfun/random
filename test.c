@@ -3,8 +3,8 @@
 
 #include "greatest/greatest.h"
 
-#include "rand32.h"
-#include "rand64.h"
+#include "random/rand32.h"
+#include "random/rand64.h"
 
 TEST rand32_test(void) {
     uint32_t random_value = rand32();

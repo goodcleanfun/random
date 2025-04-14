@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "pcg32.h"
+#include "random/pcg32.h"
 #include "spinlock/spinlock.h"
 
 #ifndef IS_UNIX
