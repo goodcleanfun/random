@@ -1,6 +1,6 @@
 {
     "name": "random",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "repo": "goodcleanfun/random",
     "description": "Random number generation using the PCG family (same as numpy), including 32 and 64 bit implementations",
     "keywords": [],
