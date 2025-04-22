@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "random/os.h"
-#include "random/pcg64.h"
+#include "os.h"
+#include "pcg64.h"
 #include "spinlock/spinlock.h"
 
 typedef pcg64_random_t rand64_gen_t;

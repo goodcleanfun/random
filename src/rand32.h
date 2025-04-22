@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "random/os.h"
-#include "random/pcg32.h"
+#include "os.h"
+#include "pcg32.h"
 #include "spinlock/spinlock.h"
 
 typedef pcg32_random_t rand32_gen_t;
