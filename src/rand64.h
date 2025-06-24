@@ -1,6 +1,7 @@
 #ifndef RAND64_H
 #define RAND64_H
 
+#include <stdatomic.h>
 #include <stdbool.h>
 
 #include "os.h"
@@ -9,12 +10,13 @@
 
 typedef pcg64_random_t rand64_gen_t;
 static rand64_gen_t pcg64_global;
-static bool pcg64_initialized = false;
-static spinlock_t pcg64_lock = SPINLOCK_INIT;
+// default value of static atomic variables is zero without initialization
+static atomic_bool pcg64_initialized;
+static spinlock_t pcg64_lock;
 
 static inline void rand64_init(bool random_seed) {
     spinlock_lock(&pcg64_lock);
-    if (pcg64_initialized) {
+    if (atomic_load(&pcg64_initialized)) {
         spinlock_unlock(&pcg64_lock);
         return;
     }
@@ -24,22 +26,22 @@ static inline void rand64_init(bool random_seed) {
         os_random_bytes(seeds, sizeof(seeds));
         pcg64_srandom_r(&pcg64_global, seeds[0], seeds[1]);
     }
-    pcg64_initialized = true;
+    atomic_store(&pcg64_initialized, true);
     spinlock_unlock(&pcg64_lock);
 }
 
 static inline void rand64_seed(uint64_t seed1, uint64_t seed2) {
-    if (!pcg64_initialized) rand64_init(false);
+    if (!atomic_load(&pcg64_initialized)) rand64_init(false);
     pcg64_srandom_r(&pcg64_global, (pcg128_t) PCG_128BIT_CONSTANT(0, seed1), (pcg128_t) PCG_128BIT_CONSTANT(0, seed2));
 }
 
 static inline uint64_t rand64() {
-    if (!pcg64_initialized) rand64_init(true);
+    if (!atomic_load(&pcg64_initialized)) rand64_init(true);
     return pcg64_random_r(&pcg64_global);
 }
 
 static inline uint64_t rand64_bounded(uint64_t bound) {
-    if (!pcg64_initialized) rand64_init(true);
+    if (!atomic_load(&pcg64_initialized)) rand64_init(true);
     return pcg64_boundedrand_r(&pcg64_global, bound);
 }
 

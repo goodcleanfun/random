@@ -36,34 +36,34 @@
  *     different seeds).  Makes no attempt at cryptographic security.
  */
 
-void fallback_os_random_bytes(void *dest, size_t size)
+static atomic_bool fallback_os_random_initialized;
+static spinlock_t fallback_os_random_lock;
+static pcg32_random_t fallback_os_random_entropy_rng;
+
+static void fallback_os_random_bytes(void *dest, size_t size)
 {
-    /* Most modern OSs use address-space randomization, meaning that we can
-       use the address of stack variables and system library code as
-       initializers.  It's not as good as using /dev/random, but probably
-       better than using the current time alone. */
+    if (!atomic_load(&fallback_os_random_initialized)) {
+        spinlock_lock(&fallback_os_random_lock);
+        if (!atomic_load(&fallback_os_random_initialized)) {
+            /* Most modern OSs use address-space randomization, meaning that we can
+            use the address of stack variables and system library code as
+            initializers.  It's not as good as using /dev/random, but probably
+            better than using the current time alone. */
 
-    spinlock_t mutex = SPINLOCK_INIT;
-    spinlock_lock(&mutex);
+            int local;  // Used as a local variable for address-space randomization    
+            pcg32_srandom_r(&fallback_os_random_entropy_rng,
+                            time(NULL) ^ (intptr_t)&fallback_os_random_bytes,
+                            (intptr_t)&local);
 
-    static bool intitialized = false;
-    static pcg32_random_t entropy_rng;
-    
-    if (!intitialized) {
-        // Used as a local variable for address-space randomization
-        int local;
-        pcg32_srandom_r(&entropy_rng,
-                        time(NULL) ^ (intptr_t)&fallback_os_random_bytes, 
-                        (intptr_t)&local);
-        intitialized = 1;
+            atomic_store(&fallback_os_random_initialized, true);
+        }
+        spinlock_unlock(&fallback_os_random_lock);
     }
     
     char *dest_cp = (char *) dest;
     for (size_t i = 0; i < size; ++i) {
-        dest_cp[i] = (char) pcg32_random_r(&entropy_rng);
+        dest_cp[i] = (char) pcg32_random_r(&fallback_os_random_entropy_rng);
     }
-
-    spinlock_unlock(&mutex);
 }
 
 #if HAVE_DEV_RANDOM 

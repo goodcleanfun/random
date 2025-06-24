@@ -1,6 +1,7 @@
 #ifndef RAND32_H
 #define RAND32_H
 
+#include <stdatomic.h>
 #include <stdbool.h>
 
 #include "os.h"
@@ -9,12 +10,13 @@
 
 typedef pcg32_random_t rand32_gen_t;
 static rand32_gen_t pcg32_global;
-static bool pcg32_initialized = false;
-static spinlock_t pcg32_lock = SPINLOCK_INIT;
+// default value of static atomic variables is zero without initialization
+static atomic_bool pcg32_initialized;
+static spinlock_t pcg32_lock;
 
 static inline void rand32_init(bool random_seed) {
     spinlock_lock(&pcg32_lock);
-    if (pcg32_initialized) {
+    if (atomic_load(&pcg32_initialized)) {
         spinlock_unlock(&pcg32_lock);
         return;
     }
@@ -26,22 +28,22 @@ static inline void rand32_init(bool random_seed) {
         }
         pcg32_srandom_r(&pcg32_global, seeds[0], seeds[1]);
     }
-    pcg32_initialized = true;
+    atomic_store(&pcg32_initialized, true);
     spinlock_unlock(&pcg32_lock);
 }
 
 static inline void rand32_seed(uint32_t seed1, uint32_t seed2) {
-    if (!pcg32_initialized) rand32_init(false);
+    if (!atomic_load(&pcg32_initialized)) rand32_init(false);
     pcg32_srandom_r(&pcg32_global, seed1, seed2);
 }
 
 static inline uint32_t rand32() {
-    if (!pcg32_initialized) rand32_init(true);
+    if (!atomic_load(&pcg32_initialized)) rand32_init(true);
     return pcg32_random_r(&pcg32_global);
 }
 
 static inline uint32_t rand32_bounded(uint32_t bound) {
-    if (!pcg32_initialized) rand32_init(true);
+    if (!atomic_load(&pcg32_initialized)) rand32_init(true);
     return pcg32_boundedrand_r(&pcg32_global, bound);
 }
 
