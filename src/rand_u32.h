@@ -33,7 +33,6 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 #include "rand_os.h"
 #include "rand_seed.h"
 #include "rand_u64.h"
-#include "rotl.h"
 
 #define RAND_U32_STATE_SIZE 4
 

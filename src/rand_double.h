@@ -67,7 +67,7 @@ static inline uint64_t rand_double_raw(rand_double_t *rng) {
 
 	s[2] ^= t;
 
-	s[3] = rotl64(s[3], 45);
+	s[3] = rotl(s[3], 45);
 
 	return result;
 }

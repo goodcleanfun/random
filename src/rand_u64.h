@@ -51,7 +51,7 @@ static inline void rand_u64_init(rand_u64_t *rng) {
 
 static inline uint64_t rand_u64(rand_u64_t *rng) {
     uint64_t *s = rng->state;
-	const uint64_t result = rotl64(s[0] + s[3], 23) + s[0];
+	const uint64_t result = rotl(s[0] + s[3], 23) + s[0];
 
 	const uint64_t t = s[1] << 17;
 
@@ -62,7 +62,7 @@ static inline uint64_t rand_u64(rand_u64_t *rng) {
 
 	s[2] ^= t;
 
-	s[3] = rotl64(s[3], 45);
+	s[3] = rotl(s[3], 45);
 
 	return result;
 }

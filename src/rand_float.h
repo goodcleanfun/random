@@ -44,7 +44,6 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 #include "rand_os.h"
 #include "rand_seed.h"
 #include "rand_double.h"
-#include "rotl.h"
 
 typedef rand_double_t rand_float_t;
 
