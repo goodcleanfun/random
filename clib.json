@@ -2,7 +2,7 @@
     "name": "random",
     "version": "0.3.1",
     "repo": "goodcleanfun/random",
-    "description": "Random number generation using the PCG family (same as numpy), including 32 and 64 bit implementations",
+    "description": "Random number generation using the xoshiro256++ family for ints and xoshiro256+ for floats",
     "keywords": [],
     "license": "MIT",
     "dependencies": {
@@ -12,11 +12,13 @@
         "silentbicycle/greatest": "*"
     },
     "src": [
-        "src/os.h",
-        "src/pcg32.h",
-        "src/pcg64.h",
-        "src/rand32.h",
-        "src/rand64.h"
+        "src/rand_float.h",
+        "src/rand_double.h",
+        "src/rand_os.h",
+        "src/rand_seed.h",
+        "src/rand_u32.h",
+        "src/rand_u64.h",
+        "src/rotl.h"
     ]
     
   }

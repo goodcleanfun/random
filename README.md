@@ -1,2 +1,2 @@
 # random
-Random number generation using the PCG family (same as numpy), including 32 and 64 bit implementations
+Random number generation using the xoshiro256++ family for ints and xoshiro256+ for floats
