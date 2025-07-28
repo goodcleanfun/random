@@ -39,17 +39,17 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 typedef struct {
     uint64_t state[RAND_U64_STATE_SIZE];
-} rand_u64_t;
+} rand_u64_gen_t;
 
-static inline void rand_u64_init_seed(rand_u64_t *rng, uint64_t seed) {
+static inline void rand_u64_init_seed(rand_u64_gen_t *rng, uint64_t seed) {
     rand_state_init(seed, rng->state, RAND_U64_STATE_SIZE);
 }
 
-static inline void rand_u64_init(rand_u64_t *rng) {
+static inline void rand_u64_init(rand_u64_gen_t *rng) {
     rand_u64_init_seed(rng, os_random_seed());
 }
 
-static inline uint64_t rand_u64(rand_u64_t *rng) {
+static inline uint64_t rand_u64(rand_u64_gen_t *rng) {
     uint64_t *s = rng->state;
 	const uint64_t result = rotl(s[0] + s[3], 23) + s[0];
 
@@ -67,7 +67,7 @@ static inline uint64_t rand_u64(rand_u64_t *rng) {
 	return result;
 }
 
-static inline uint64_t rand_u64_bounded(rand_u64_t *rng, uint64_t bound) {
+static inline uint64_t rand_u64_bounded(rand_u64_gen_t *rng, uint64_t bound) {
     if (bound == 0) {
         return 0;
     }
@@ -84,7 +84,7 @@ static inline uint64_t rand_u64_bounded(rand_u64_t *rng, uint64_t bound) {
    to 2^128 calls to next(); it can be used to generate 2^128
    non-overlapping subsequences for parallel computations. */
 
-static inline void rand_u64_jump(rand_u64_t *rng) {
+static inline void rand_u64_jump(rand_u64_gen_t *rng) {
     uint64_t *s = rng->state;
 	static const uint64_t JUMP[4] = { 0x180ec6d33cfd0aba, 0xd5a61266f0c9392c, 0xa9582618e03fc9aa, 0x39abdc4529b1661c };
 
@@ -116,7 +116,7 @@ static inline void rand_u64_jump(rand_u64_t *rng) {
    from each of which jump() will generate 2^64 non-overlapping
    subsequences for parallel distributed computations. */
 
-static inline void rand_u64_long_jump(rand_u64_t *rng) {
+static inline void rand_u64_long_jump(rand_u64_gen_t *rng) {
     uint64_t *s = rng->state;
 	static const uint64_t LONG_JUMP[4] = { 0x76e15d3efefdcbbf, 0xc5004e441c522fb3, 0x77710069854ee241, 0x39109bb02acbe635 };
 

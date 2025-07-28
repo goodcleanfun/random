@@ -45,17 +45,17 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 #include "rand_seed.h"
 #include "rand_double.h"
 
-typedef rand_double_t rand_float_t;
+typedef rand_double_gen_t rand_float_gen_t;
 
-static inline void rand_float_init_seed(rand_float_t *rng, uint64_t seed) {   
+static inline void rand_float_init_seed(rand_float_gen_t *rng, uint64_t seed) {   
     rand_double_init_seed(rng, seed);
 }
 
-static inline void rand_float_init(rand_float_t *rng) {
+static inline void rand_float_init(rand_float_gen_t *rng) {
     rand_float_init_seed(rng, os_random_seed());
 }
 
-static inline uint32_t rand_float_raw(rand_float_t *rng) {
+static inline uint32_t rand_float_raw(rand_float_gen_t *rng) {
     uint64_t value = rand_double_raw(rng);
     uint32_t result = value >> 32;
     return result;
@@ -65,16 +65,16 @@ static inline float bits_to_float(uint32_t bits) {
     return (bits >> 8) * 0x1.0p-24f;
 }
 
-static inline float rand_float(rand_float_t *rng) {
+static inline float rand_float(rand_float_gen_t *rng) {
     return bits_to_float(rand_float_raw(rng));
 }
 
-static inline float rand_float_uniform(rand_float_t *rng) {
+static inline float rand_float_uniform(rand_float_gen_t *rng) {
     uint32_t bits = rand_float_raw(rng);
     return (bits >> 8) * (1.0f / (1U << 24));
 }
 
-static inline float rand_float_bounded(rand_float_t *rng, float low, float high) {
+static inline float rand_float_bounded(rand_float_gen_t *rng, float low, float high) {
     return low + (high - low) * rand_float_uniform(rng);
 }
 
@@ -82,7 +82,7 @@ static inline float rand_float_bounded(rand_float_t *rng, float low, float high)
    to 2^64 calls to next(); it can be used to generate 2^64
    non-overlapping subsequences for parallel computations. */
 
-static inline void rand_float_jump(rand_float_t *rng) {
+static inline void rand_float_jump(rand_float_gen_t *rng) {
     rand_double_jump(rng);
 }
 
@@ -92,6 +92,6 @@ static inline void rand_float_jump(rand_float_t *rng) {
    from each of which jump() will generate 2^32 non-overlapping
    subsequences for parallel distributed computations. */
 
-static inline void rand_float_long_jump(rand_float_t *rng) {
+static inline void rand_float_long_jump(rand_float_gen_t *rng) {
     rand_double_long_jump(rng);
 }

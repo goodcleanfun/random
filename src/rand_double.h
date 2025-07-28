@@ -43,17 +43,17 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 typedef struct {
     uint64_t state[RAND_DOUBLE_STATE_SIZE];
-} rand_double_t;
+} rand_double_gen_t;
 
-static inline void rand_double_init_seed(rand_double_t *rng, uint64_t seed) {
+static inline void rand_double_init_seed(rand_double_gen_t *rng, uint64_t seed) {
     rand_state_init(seed, rng->state, RAND_DOUBLE_STATE_SIZE);
 }
 
-static inline void rand_double_init(rand_double_t *rng) {
+static inline void rand_double_init(rand_double_gen_t *rng) {
     rand_double_init_seed(rng, os_random_seed());
 }
 
-static inline uint64_t rand_double_raw(rand_double_t *rng) {
+static inline uint64_t rand_double_raw(rand_double_gen_t *rng) {
     uint64_t *s = rng->state;
 
 	const uint64_t result = s[0] + s[3];
@@ -76,17 +76,17 @@ static inline double bits_to_double(uint64_t bits) {
     return (bits >> 11) * 0x1.0p-53;
 }
 
-static inline double rand_double(rand_double_t *rng) {
+static inline double rand_double(rand_double_gen_t *rng) {
 	uint64_t bits = rand_double_raw(rng);
     return bits_to_double(bits);
 }
 
-static inline double rand_double_uniform(rand_double_t *rng) {
+static inline double rand_double_uniform(rand_double_gen_t *rng) {
     uint64_t bits = rand_double_raw(rng);
 	return (bits >> 11) * (1.0 / (1ULL << 53));
 }
 
-static inline double rand_double_bounded(rand_double_t *rng, double low, double high) {
+static inline double rand_double_bounded(rand_double_gen_t *rng, double low, double high) {
     return low + (high - low) * rand_double_uniform(rng);
 }
 
@@ -94,7 +94,7 @@ static inline double rand_double_bounded(rand_double_t *rng, double low, double 
    to 2^128 calls to next(); it can be used to generate 2^128
    non-overlapping subsequences for parallel computations. */
 
-static inline void rand_double_jump(rand_double_t *rng) {
+static inline void rand_double_jump(rand_double_gen_t *rng) {
 	uint64_t *s = rng->state;
 	static const uint64_t JUMP[] = { 0x180ec6d33cfd0aba, 0xd5a61266f0c9392c, 0xa9582618e03fc9aa, 0x39abdc4529b1661c };
 
@@ -125,7 +125,7 @@ static inline void rand_double_jump(rand_double_t *rng) {
    from each of which jump() will generate 2^64 non-overlapping
    subsequences for parallel distributed computations. */
 
-static inline void rand_double_long_jump(rand_double_t *rng) {
+static inline void rand_double_long_jump(rand_double_gen_t *rng) {
 	uint64_t *s = rng->state;
 	static const uint64_t LONG_JUMP[] = { 0x76e15d3efefdcbbf, 0xc5004e441c522fb3, 0x77710069854ee241, 0x39109bb02acbe635 };
 
