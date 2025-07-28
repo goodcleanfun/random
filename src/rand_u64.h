@@ -37,7 +37,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 #define RAND_U64_STATE_SIZE 4
 
-typedef struct rand_u64 {
+typedef struct {
     uint64_t state[RAND_U64_STATE_SIZE];
 } rand_u64_t;
 
@@ -49,7 +49,7 @@ static inline void rand_u64_init(rand_u64_t *rng) {
     rand_u64_init_seed(rng, os_random_seed());
 }
 
-static inline uint64_t rand_u64_next(rand_u64_t *rng) {
+static inline uint64_t rand_u64(rand_u64_t *rng) {
     uint64_t *s = rng->state;
 	const uint64_t result = rotl64(s[0] + s[3], 23) + s[0];
 
@@ -73,7 +73,7 @@ static inline uint64_t rand_u64_bounded(rand_u64_t *rng, uint64_t bound) {
     }
     uint64_t threshold = -bound % bound;
     for (;;) {
-        uint64_t r = rand_u64_next(rng);
+        uint64_t r = rand_u64(rng);
         if (r >= threshold) {
             return r % bound;
         }
@@ -100,7 +100,7 @@ static inline void rand_u64_jump(rand_u64_t *rng) {
 				s2 ^= s[2];
 				s3 ^= s[3];
 			}
-			rand_u64_next(rng);	
+			rand_u64(rng);	
 		}
     }
 	s[0] = s0;
@@ -132,7 +132,7 @@ static inline void rand_u64_long_jump(rand_u64_t *rng) {
 				s2 ^= s[2];
 				s3 ^= s[3];
 			}
-			rand_u64_next(rng);	
+			rand_u64(rng);	
 		}
 	}
 	s[0] = s0;

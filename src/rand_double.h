@@ -53,7 +53,7 @@ static inline void rand_double_init(rand_double_t *rng) {
     rand_double_init_seed(rng, os_random_seed());
 }
 
-static inline uint64_t rand_double_next_raw(rand_double_t *rng) {
+static inline uint64_t rand_double_raw(rand_double_t *rng) {
     uint64_t *s = rng->state;
 
 	const uint64_t result = s[0] + s[3];
@@ -76,13 +76,13 @@ static inline double bits_to_double(uint64_t bits) {
     return (bits >> 11) * 0x1.0p-53;
 }
 
-static inline double rand_double_next(rand_double_t *rng) {
-	uint64_t bits = rand_double_next_raw(rng);
+static inline double rand_double(rand_double_t *rng) {
+	uint64_t bits = rand_double_raw(rng);
     return bits_to_double(bits);
 }
 
 static inline double rand_double_uniform(rand_double_t *rng) {
-    uint64_t bits = rand_double_next_raw(rng);
+    uint64_t bits = rand_double_raw(rng);
 	return (bits >> 11) * (1.0 / (1ULL << 53));
 }
 
@@ -110,7 +110,7 @@ static inline void rand_double_jump(rand_double_t *rng) {
 				s2 ^= s[2];
 				s3 ^= s[3];
 			}
-			rand_double_next(rng);
+			rand_double(rng);
 		}
 		
 	s[0] = s0;
@@ -141,7 +141,7 @@ static inline void rand_double_long_jump(rand_double_t *rng) {
 				s2 ^= s[2];
 				s3 ^= s[3];
 			}
-			rand_double_next(rng);
+			rand_double(rng);
 		}
 		
 	s[0] = s0;

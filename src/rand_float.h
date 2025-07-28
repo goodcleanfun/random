@@ -56,8 +56,8 @@ static inline void rand_float_init(rand_float_t *rng) {
     rand_float_init_seed(rng, os_random_seed());
 }
 
-static inline uint32_t rand_float_next_raw(rand_float_t *rng) {
-    uint64_t value = rand_double_next_raw(rng);
+static inline uint32_t rand_float_raw(rand_float_t *rng) {
+    uint64_t value = rand_double_raw(rng);
     uint32_t result = value >> 32;
     return result;
 }
@@ -66,12 +66,12 @@ static inline float bits_to_float(uint32_t bits) {
     return (bits >> 8) * 0x1.0p-24f;
 }
 
-static inline float rand_float_next(rand_float_t *rng) {
-    return bits_to_float(rand_float_next_raw(rng));
+static inline float rand_float(rand_float_t *rng) {
+    return bits_to_float(rand_float_raw(rng));
 }
 
 static inline float rand_float_uniform(rand_float_t *rng) {
-    uint32_t bits = rand_float_next_raw(rng);
+    uint32_t bits = rand_float_raw(rng);
     return (bits >> 8) * (1.0f / (1U << 24));
 }
 

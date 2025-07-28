@@ -37,7 +37,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 #define RAND_U32_STATE_SIZE 4
 
-typedef struct rand_u64 rand_u32_t;
+typedef rand_u64_t rand_u32_t;
 
 static inline void rand_u32_init_seed(rand_u32_t *rng, uint64_t seed) {
     rand_u64_init_seed(rng, seed);
@@ -47,8 +47,8 @@ static inline void rand_u32_init(rand_u32_t *rng) {
     rand_u32_init_seed(rng, os_random_seed());
 }
 
-static inline uint32_t rand_u32_next(rand_u32_t *rng) {
-	uint64_t value = rand_u64_next(rng);
+static inline uint32_t rand_u32(rand_u32_t *rng) {
+	uint64_t value = rand_u64(rng);
 	// Use higher bits since lower bits have some corre
 	uint32_t result = value >> 32;
 	return result;
@@ -60,7 +60,7 @@ static inline uint32_t rand_u32_bounded(rand_u32_t *rng, uint32_t bound) {
     }
     uint32_t threshold = -bound % bound;
     for (;;) {
-        uint32_t r = rand_u32_next(rng);
+        uint32_t r = rand_u32(rng);
         if (r >= threshold) {
             return r % bound;
         }
